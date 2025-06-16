@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corazón en el Medio</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(to top, #ffe6f0, #fff0f5);
+      overflow: hidden;
+      position: relative;
+    }
+    h1 {
+      margin-top: 40px;
+      font-size: 26px;
+      color: #e60026;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      position: relative;
+      width: fit-content;
+    }
+    .particle, .heart-burst {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: explode 1s ease-out forwards;
+    }
+    .heart-burst::before {
+      content: '❤';
+      font-size: 16px;
+      color: red;
+      position: absolute;
+      animation: explode 1s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(1) translate(0, 0); opacity: 1; }
+      100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+    }
+    .container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    .heart {
+      width: 300px;
+      height: 270px;
+      background-color: red;
+      position: relative;
+      transform: rotate(-45deg);
+      animation: heartbeat 1s infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: rotate(-45deg) scale(1); }
+      50% { transform: rotate(-45deg) scale(1.05); }
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      width: 300px;
+      height: 270px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .heart::before {
+      top: -150px;
+      left: 0;
+    }
+    .heart::after {
+      left: 150px;
+      top: 0;
+      box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.5);
+      animation: brillar 2s infinite alternate;
+    }
+    @keyframes brillar {
+      from { box-shadow: 0 0 5px 2px rgba(255, 0, 0, 0.3); }
+      to { box-shadow: 0 0 20px 8px rgba(255, 0, 0, 0.7); }
+    }
+    .heart-content {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 240px;
+      height: 240px;
+      overflow: hidden;
+      border-radius: 20px;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .heart-content img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      position: absolute;
+      transition: opacity 1s ease-in-out;
+    }
+    .heart-content img.active {
+      opacity: 1;
+      position: relative;
+    }
+    .floating-message {
+      position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      color: #d10040;
+      font-family: 'Arial', sans-serif;
+      pointer-events: none;
+      animation: fadeFloat 2s forwards;
+    }
+    @keyframes fadeFloat {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-40px); }
+    }
+    .dedicatoria, .contador {
+      position: fixed;
+      font-size: 22px;
+      color: #c71585;
+      font-family: 'Courier New', cursive;
+      animation: flotar 6s infinite ease-in-out;
+      text-align: center;
+      width: 100%;
+      pointer-events: none;
+    }
+    .dedicatoria {
+      bottom: 80px;
+    }
+    .contador {
+      top: 90px;
+    }
+    @keyframes flotar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 💐 Flores animadas (dibujo animado) */
+    .flor {
+      position: absolute;
+      bottom: -50px;
+      font-size: 30px;
+      animation: crecer 10s infinite ease-in;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes crecer {
+      0% {
+        transform: translateY(0) scale(0.5) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-150vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body onclick="playMusic(); showLoveMessage(event)">
+  <audio id="backgroundMusic" controls loop style="position: fixed; bottom: 10px; width: 300px;">
+    <source src="Baile.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio HTML5.
+  </audio>
+
+  <h1 id="mesarioText">FELIZ MESARIO MI AMORCITO</h1>
+  <div id="contador" class="contador"></div>
+  <div class="dedicatoria">Eres el amor de mi vida ❤️</div>
+  <div class="container">
+    <div class="heart">
+      <div class="heart-content" id="heartContent">
+        <img src="Carta1.jpg" alt="Carta 1" class="active">
+        <img src="Carta2.jpg" alt="Carta 2">
+        <img src="Carta3.jpg" alt="Carta 3">
+        <img src="Carta4.jpg" alt="Carta 4">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const images = document.querySelectorAll('#heartContent img');
+    let index = 0;
+    setInterval(() => {
+      images[index].classList.remove('active');
+      index = (index + 1) % images.length;
+      images[index].classList.add('active');
+    }, 2000);
+
+    const messages = [
+      "Te amo (Español)", "I love you (Inglés)", "Je t’aime (Francés)",
+      "Ich liebe dich (Alemán)", "Ti amo (Italiano)", "Eu te amo (Portugués)",
+      "愛してる (Japonés)", "사랑해 (Coreano)", "Я тебя люблю (Ruso)", "Wo ai ni (Chino)"
+    ];
+    let messageIndex = 0;
+    function showLoveMessage(event) {
+      const msg = document.createElement("div");
+      msg.className = "floating-message";
+      msg.textContent = messages[messageIndex];
+      messageIndex = (messageIndex + 1) % messages.length;
+      msg.style.left = `${event.clientX}px`;
+      msg.style.top = `${event.clientY}px`;
+      document.body.appendChild(msg);
+      setTimeout(() => msg.remove(), 2000);
+      createHeartBurst(event.clientX, event.clientY);
+    }
+    function createHeartBurst(x, y) {
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart-burst";
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = 60 + Math.random() * 30;
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
+        heart.style.setProperty('--x', `${dx}px`);
+        heart.style.setProperty('--y', `${dy}px`);
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+      }
+    }
+    function playMusic() {
+      const music = document.getElementById("backgroundMusic");
+      if (music.paused) {
+        music.play().catch(err => console.log("Reproducción bloqueada por el navegador"));
+      }
+    }
+
+    // 🎉 Confeti
+    const confetiScript = document.createElement('script');
+    confetiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+    confetiScript.onload = () => {
+      setTimeout(() => {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          }, i * 500);
+        }
+      }, 500);
+    };
+    document.head.appendChild(confetiScript);
+
+    // 🕒 Contador
+    const fechaInicio = new Date('2022-08-16T00:00:00');
+    setInterval(() => {
+      const ahora = new Date();
+      const dif = ahora - fechaInicio;
+      const dias = Math.floor(dif / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((dif / (1000 * 60 * 60)) % 24);
+      const minutos = Math.floor((dif / (1000 * 60)) % 60);
+      const segundos = Math.floor((dif / 1000) % 60);
+      const totalMeses = Math.floor(dias / 30.44);
+      const totalAnios = Math.floor(totalMeses / 12);
+      const mesesRestantes = totalMeses % 12;
+      document.getElementById('contador').textContent =
+        `Juntos por ${totalAnios} años, ${mesesRestantes} meses, ${dias} días, ${horas}h ${minutos}m ${segundos}s ❤️`;
+    }, 1000);
+
+    // 🌸 Crear flores animadas
+    function crearFlor() {
+      const flor = document.createElement('div');
+      flor.className = 'flor';
+      flor.textContent = '🌸';
+      flor.style.left = Math.random() * 100 + 'vw';
+      flor.style.animationDuration = (6 + Math.random() * 5) + 's';
+      document.body.appendChild(flor);
+      setTimeout(() => flor.remove(), 12000);
+    }
+    setInterval(crearFlor, 800);
+  </script>
+</body>
+</html>
